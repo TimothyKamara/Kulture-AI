@@ -1,0 +1,16 @@
+project_id = "rjneywbamutyirmvflxl"
+
+[functions.chat]
+verify_jwt = false
+
+[functions.trip-planner]
+verify_jwt = false
+
+[functions.quiz]
+verify_jwt = false
+
+[functions.story]
+verify_jwt = false
+
+[functions.insights]
+verify_jwt = false
