@@ -4,6 +4,7 @@ import { streamChat } from "@/lib/streaming";
 import { Send, BookOpen, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import VoiceNarrator from "@/components/VoiceNarrator";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -98,9 +99,19 @@ export default function Chat() {
               }`}
             >
               {m.role === "assistant" ? (
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <ReactMarkdown>{m.content}</ReactMarkdown>
-                </div>
+                <>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-3 pt-3 border-t border-border/50"
+                  >
+                    <VoiceNarrator text={m.content} />
+                  </motion.div>
+                </>
               ) : (
                 m.content
               )}
