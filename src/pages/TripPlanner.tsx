@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { streamChat } from "@/lib/streaming";
-import { Map, Loader2, Plane } from "lucide-react";
+import { Map, Loader2, Plane, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import VoiceNarrator from "@/components/VoiceNarrator";
@@ -10,6 +10,8 @@ export default function TripPlanner() {
   const { t, language } = useLanguage();
   const [days, setDays] = useState(3);
   const [budget, setBudget] = useState("medium");
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [budgetCurrency, setBudgetCurrency] = useState("USD");
   const [interests, setInterests] = useState<string[]>([]);
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +33,7 @@ export default function TripPlanner() {
     let text = "";
     await streamChat({
       endpoint: "trip-planner",
-      body: { days, budget, interests, language },
+      body: { days, budget, budgetAmount: budgetAmount ? parseFloat(budgetAmount) : null, budgetCurrency, interests, language },
       onDelta: (chunk) => { text += chunk; setResult(text); },
       onDone: () => setLoading(false),
       onError: (err) => { setResult(`⚠️ ${err}`); setLoading(false); },
@@ -70,9 +72,9 @@ export default function TripPlanner() {
             </div>
           </div>
 
-          {/* Budget */}
+          {/* Budget Tier */}
           <div>
-            <label className="text-sm font-medium text-foreground">Budget</label>
+            <label className="text-sm font-medium text-foreground">Budget Level</label>
             <div className="flex gap-2 mt-2">
               {[
                 { val: "budget", label: "$ Budget" },
@@ -90,6 +92,35 @@ export default function TripPlanner() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Budget Amount */}
+          <div>
+            <label className="text-sm font-medium text-foreground">Your Total Budget <span className="text-muted-foreground font-normal">(optional but recommended)</span></label>
+            <div className="flex gap-2 mt-2">
+              <div className="relative flex-1">
+                <DollarSign size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 500"
+                  value={budgetAmount}
+                  onChange={(e) => setBudgetAmount(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 rounded-lg bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <select
+                value={budgetCurrency}
+                onChange={(e) => setBudgetCurrency(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-muted border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="USD">USD $</option>
+                <option value="GBP">GBP £</option>
+                <option value="EUR">EUR €</option>
+                <option value="SLL">SLL Le</option>
+              </select>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">The AI will tailor your itinerary to this exact budget and advise if it's too low.</p>
           </div>
 
           {/* Interests */}

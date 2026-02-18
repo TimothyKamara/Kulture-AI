@@ -10,7 +10,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { days, budget, interests, language } = await req.json();
+    const { days, budget, budgetAmount, budgetCurrency, interests, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -23,9 +23,18 @@ serve(async (req) => {
     const langMap: Record<string, string> = { kri: "Krio", fr: "French", es: "Spanish", zh: "Chinese" };
     const langInstruction = language && language !== "en" ? `Respond in ${langMap[language] || "English"}.` : "";
 
+    const budgetLine = budgetAmount
+      ? `Exact budget: ${budgetAmount} ${budgetCurrency || "USD"} total for the entire trip.`
+      : `Budget level: ${budget}`;
+
+    const budgetWarningInstruction = budgetAmount
+      ? `IMPORTANT: If the provided budget (${budgetAmount} ${budgetCurrency || "USD"}) is genuinely too low for a ${days}-day trip to Sierra Leone, clearly and kindly say so at the TOP of your response BEFORE the itinerary. Explain what that budget can realistically cover, give a recommended minimum budget, and then provide a scaled-down itinerary or tips to make it work. Be honest but encouraging.`
+      : "";
+
     const systemPrompt = `You are KultureAI Trip Planner. Create a detailed ${days}-day Sierra Leone itinerary.
 
-Budget level: ${budget}
+${budgetLine}
+${budgetWarningInstruction}
 Interests: ${(interests || []).join(", ") || "General"}
 ${langInstruction}
 
@@ -35,14 +44,14 @@ ${(destinations || []).map(d => `- ${d.name} (${d.location}, ${d.category}): ${d
 SERVICES:
 ${(services || []).map(s => `- ${s.name} (${s.type}, ${s.location}): ${s.description} [${s.price_range}]`).join("\n")}
 
-Format as a day-by-day itinerary with Morning, Afternoon, Evening sections. Include specific destinations, estimated costs, travel tips, and cultural notes. Use markdown.`;
+Format as a day-by-day itinerary with Morning, Afternoon, Evening sections. Include specific destinations, estimated costs in ${budgetCurrency || "USD"}, travel tips, and cultural notes. Use markdown.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Plan a ${days}-day trip to Sierra Leone with a ${budget} budget focused on: ${(interests || []).join(", ") || "everything"}` }],
+        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Plan a ${days}-day trip to Sierra Leone with a ${budget} budget${budgetAmount ? ` of ${budgetAmount} ${budgetCurrency || "USD"}` : ""} focused on: ${(interests || []).join(", ") || "everything"}` }],
         stream: true,
       }),
     });
