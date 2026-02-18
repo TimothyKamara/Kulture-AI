@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Loader2, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import VoiceNarrator from "@/components/VoiceNarrator";
 
 export default function Stories() {
   const { t, language } = useLanguage();
@@ -72,8 +73,11 @@ export default function Stories() {
 
         {story && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 bg-card border border-border rounded-xl p-6">
-            <div className="prose prose-sm max-w-none dark:prose-invert font-body leading-relaxed">
+          <div className="prose prose-sm max-w-none dark:prose-invert font-body leading-relaxed">
               <ReactMarkdown>{story}</ReactMarkdown>
+            </div>
+            <div className="mt-4 pt-4 border-t border-border/50">
+              <VoiceNarrator text={story} />
             </div>
           </motion.div>
         )}

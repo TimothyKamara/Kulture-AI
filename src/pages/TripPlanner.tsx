@@ -4,6 +4,7 @@ import { streamChat } from "@/lib/streaming";
 import { Map, Loader2, Plane } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import VoiceNarrator from "@/components/VoiceNarrator";
 
 export default function TripPlanner() {
   const { t, language } = useLanguage();
@@ -128,8 +129,11 @@ export default function TripPlanner() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 bg-card border border-border rounded-xl p-6"
           >
-            <div className="prose prose-sm max-w-none dark:prose-invert">
+          <div className="prose prose-sm max-w-none dark:prose-invert">
               <ReactMarkdown>{result}</ReactMarkdown>
+            </div>
+            <div className="mt-4 pt-4 border-t border-border/50">
+              <VoiceNarrator text={result} />
             </div>
           </motion.div>
         )}
