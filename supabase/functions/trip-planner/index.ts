@@ -44,7 +44,15 @@ ${(destinations || []).map(d => `- ${d.name} (${d.location}, ${d.category}): ${d
 SERVICES:
 ${(services || []).map(s => `- ${s.name} (${s.type}, ${s.location}): ${s.description} [${s.price_range}]`).join("\n")}
 
-Format as a day-by-day itinerary with Morning, Afternoon, Evening sections. Include specific destinations, estimated costs in ${budgetCurrency || "USD"}, travel tips, and cultural notes. Use markdown.`;
+STRICT OUTPUT FORMAT (markdown):
+1. Start with a short 2-3 sentence overview (and the budget assessment if applicable, as a "> " blockquote).
+2. Then a "## Budget Breakdown" is NOT allowed at the top — keep it for the end.
+3. For EACH day, a heading exactly like: "## Day 1: Short Title [theme]" where theme is ONE of: beach, wildlife, history, food, culture.
+   Under it use "### Morning", "### Afternoon", "### Evening" subheadings, each with 2-4 concise bullet points (place, activity, cost in ${budgetCurrency || "USD"}).
+   End each day with one "> 💡 Tip:" blockquote with a cultural note or travel tip.
+4. After the days, add "### Budget Breakdown" as a markdown table (Category | Estimated Cost) with a Total row.
+5. Finish with "### Packing & Etiquette" as 4-6 short bullets.
+Avoid long paragraphs and avoid overusing bold.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
