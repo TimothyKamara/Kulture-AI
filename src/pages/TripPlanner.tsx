@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { streamChat } from "@/lib/streaming";
 import { Map, Loader2, Plane, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
-import ReactMarkdown from "react-markdown";
+import ItineraryView from "@/components/ItineraryView";
 import VoiceNarrator from "@/components/VoiceNarrator";
 
 export default function TripPlanner() {
@@ -160,9 +160,7 @@ export default function TripPlanner() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 bg-card border border-border rounded-xl p-6"
           >
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{result}</ReactMarkdown>
-            </div>
+          <ItineraryView text={result} />
             <div className="mt-4 pt-4 border-t border-border/50">
               <VoiceNarrator text={result} />
             </div>
